@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    <title>Register Visitor</title>
+  </head>
+  <body>
+    <video id="video" autoplay></video>
+    <canvas id="canvas" style="display: none"></canvas>
+    <button id="capture-btn">Capture</button>
+    <button id="register-btn" style="display: none">Register</button>
+
+    <script>
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const captureBtn = document.getElementById("capture-btn");
+      const registerBtn = document.getElementById("register-btn");
+
+      // دسترسی به وب‌کم
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((err) => {
+          console.error("Error accessing webcam:", err);
+        });
+
+      // گرفتن تصویر از وب‌کم
+      captureBtn.addEventListener("click", () => {
+        const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        registerBtn.style.display = "block";
+      });
+
+      // ارسال تصویر به سرور برای ثبت مراجعه‌کننده
+      registerBtn.addEventListener("click", () => {
+        
+        const imageData = canvas.toDataURL("image/png");
+        const csrfToken = document
+          .querySelector("[name=csrf-token]")
+          .getAttribute("content");
+
+        const visitorName = prompt("Please enter your name:");
+
+        if (!visitorName) {
+          alert("Name is required!");
+          return;
+        }
+
+        fetch("/register/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+          },
+          body: JSON.stringify({
+            name: visitorName,
+            image_data: imageData,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error("HTTP error " + response.status);
+            return response.json();
+          })
+          .then((data) => {
+            if (data.status === "success") {
+              alert("Visitor registered successfully!");
+            } else {
+              alert(data.message);
+            }
+          })
+          .catch((err) => {
+            console.error("Error:", err);
+          });
+      });
+    </script>
+  </body>
+</html>
