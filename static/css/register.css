@@ -1,0 +1,100 @@
+
+@font-face {
+    font-family: 'Vazir';
+    src: url('/static/fonts/Vazirmatn-Regular.woff2') format('woff2');
+}
+/* General Reset */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+
+}
+
+/* Container for the form */
+body {
+font-family: 'Vazir';
+background-color: #f4f7fc;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+}
+
+/* Register form */
+.register-form {
+background-color: #ffffff;
+border-radius: 10px;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+padding: 40px;
+width: 100%;
+max-width: 400px;
+margin: 20px;
+text-align: center;
+transition: all 0.3s ease;
+}
+
+.form-title {
+font-size: 24px;
+font-weight: 600;
+margin-bottom: 20px;
+color: #333;
+}
+
+.form-group {
+margin-bottom: 20px;
+}
+
+/* Form Inputs - Styling for individual fields rendered by {{ form.as_p }} */
+form input,
+form select,
+form textarea {
+width: 100%;
+padding: 12px;
+font-size: 16px;
+border: 2px solid #ddd;
+border-radius: 5px;
+outline: none;
+transition: border-color 0.3s ease;
+margin-bottom: 10px;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+border-color: #5c6bc0; /* Focus color */
+}
+
+/* Submit Button */
+.form-button {
+width: 100%;
+padding: 12px;
+font-size: 16px;
+color: white;
+background-color: #5c6bc0;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+}
+
+.form-button:hover {
+background-color: #3f4a8b; /* Darker shade on hover */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+.register-form {
+padding: 30px;
+width: 80%;
+}
+}
+
+@media (max-width: 480px) {
+.register-form {
+padding: 20px;
+}
+.form-title {
+font-size: 20px;
+}
+}

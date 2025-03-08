@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت کاربر</title>
+    <link rel="stylesheet" href="{% static '/css/register.css' %}">
+    <style>
+
+    </style>
+</head>
+<body>
+    <form method="post" class="register-form" action="{% url 'user:register' %}">
+        {% csrf_token %}
+        <h2 class="form-title">Register</h2>
+        
+        <!-- Render Django form fields -->
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+    
+        <button type="submit" class="form-button">Register</button>
+    </form>
+    
+</body>
+</html>

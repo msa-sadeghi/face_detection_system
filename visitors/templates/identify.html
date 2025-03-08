@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>شناسایی مراجعه کننده</title>
+    <link rel="stylesheet" href="{% static '/css/style.css' %}">
+    <style>
+  
+
+        #submit-btn {
+            display: none;
+        }
+
+        
+    </style>
+</head>
+
+<body dir="rtl">
+
+    <header>
+        <h1>شناسایی مراجعه کننده</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'visitors:identify' %}">خانه</a></li>
+                <li><a href="{% url 'visitors:register' %}">ثبت مراجعه کننده</a></li>
+                <li><a href="#">تماس با ما</a></li>
+            </ul>
+        </nav>
+        <div class="user-account">
+            <span>خوش آمدید!{{request.user}}</span>
+            <a href="{% url 'user:logout' %}">خروج</a>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="camera-section">
+            <video id="video" autoplay></video>
+            <canvas id="canvas" style="display: none"></canvas>
+            <button id="capture-btn">گرفتن تصویر</button>
+            <button id="submit-btn">بررسی تصویر</button>
+        </div>
+        <div class="form-container">
+            <h2>مشخصات مراجعه کننده</h2>
+            
+                <div class="form-group">
+                    <label for="name">نام</label>
+                    <input type="text" name="name" id="name" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="family">نام خانوادگی</label>
+                    <input type="text" name="family" id="family" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="family">کد ملی</label>
+                    <input type="number" name="nationalCode" id="nationalCode" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="family">شرکت</label>
+                    <input type="number" name="company" id="company" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="contact">شماره تماس</label>
+                    <input type="text" name="contact" id="contact" disabled>
+                </div>
+            
+            </form>
+        </div>
+    </div>
+
+    <div class="footer" >
+        <p>&copy; شرکت آب منطقه ای مازندران</p>
+    </div>
+
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const captureBtn = document.getElementById("capture-btn");
+        const submitBtn = document.getElementById("submit-btn");
+        let nameField = document.getElementById("name");
+        let familyField = document.getElementById("family");
+        let nationalCodeField = document.getElementById("nationalCode");
+        let companyField = document.getElementById("company");
+        let contactField = document.getElementById("contact");
+
+        // access to webcam
+        navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((err) => {
+                console.error("Error accessing webcam:", err);
+            });
+
+        // take image from webcam
+        captureBtn.addEventListener("click", () => {
+            const context = canvas.getContext("2d");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            submitBtn.style.display = "block";
+            captureBtn.style.display = "none";
+        });
+
+        // send image to server
+        submitBtn.addEventListener("click", () => {
+            const imageData = canvas.toDataURL("image/png");
+
+            fetch("/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({ image_data: imageData }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.status === "success") {
+                        alert(`Visitor identified: ${data.data.name}`);
+                        nameField.value = data.data.name
+                        familyField.value = data.data.family
+                        nationalCodeField.value = data.data.nationalCode
+                        companyField.value = data.data.company
+                        contact.value = data.data.contact
+                    } else {
+                        alert("not found")
+                        window.location.href = "/register/";
+                    }
+                })
+                .catch((err) => {
+                    console.error("Error:", err);
+                });
+        });
+    </script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
